@@ -58,7 +58,12 @@ el SHA-256 del ZIP (`SHA256SUMS.txt`) y quita la marca de bloqueo con
 ## Qué hace
 
 **Inventario en vivo**
-- Lee tus archivos de guardado (`%APPDATA%\HelloGames\NMS\st_*\save*.hg`).
+- Pensado y probado con la versión de **Steam** de No Man's Sky, en Windows.
+  El juego no tiene que estar ni abierto: solo se leen los archivos de
+  guardado (`%APPDATA%\HelloGames\NMS\st_*\save*.hg`).
+- La carpeta de cada cuenta de Steam se llama `st_<id>` (por ejemplo
+  `st_76561198359375151`). Si tienes varias cuentas, aparecen agrupadas en el
+  desplegable de arriba.
 - Muestra **toda la flota**: exotraje (inventario / tecnología), las naves
   de `ShipOwnership` (carga y tecnología de cada una), las
   multiherramientas guardadas, el carguero y los contenedores del refugio.
@@ -423,6 +428,14 @@ NMS_Helper/
 
 ## Límites conocidos y siguientes pasos
 
+- **Solo Steam, y solo Windows**: está probado con la versión de Steam en
+  Windows 10/11 de 64 bits. Si compras el juego en otra tienda, sus partidas
+  podrían acabar en otra carpeta y la herramienta no las encontraría: la ruta
+  se busca en `%APPDATA%\HelloGames\NMS` y, de momento, no hay forma de
+  decirle otra (sería un ajuste en `nms_helper/save.py`, `find_saves()`).
+  Tampoco se ha probado en Linux ni en macOS, aunque el código no usa nada
+  específico de Windows salvo la ventana.
+
 - **Nombres en inglés en algunos módulos de tecnología procedural**
   (`UP_*`): la base comunitaria no publica esa traducción (sus iconos sí
   se recuperan de la tecnología base a la que mejoran). La solución
@@ -494,5 +507,11 @@ y [NMSCD/leylinecalc](https://github.com/NMSCD/leylinecalc), ambas MIT.
 
 ## Requisitos
 
-- Python 3.10 o superior (probado con 3.12).
-- No Man's Sky instalado y al menos una partida guardada.
+- **Windows 10 u 11 de 64 bits** (probado en Windows 11).
+- No Man's Sky, **versión de Steam**, con al menos una partida guardada. El
+  juego puede estar cerrado: solo se leen los archivos de la partida.
+- Para la variante con Python: 3.10 o superior (probado con 3.12), y nada
+  más. `pywebview` es opcional y solo sirve para abrir la ventana de
+  aplicación en vez del navegador.
+- Con el ejecutable no hace falta nada de esto: ni Python ni instalar
+  dependencias.
