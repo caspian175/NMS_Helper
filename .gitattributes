@@ -1,0 +1,18 @@
+# Fin de línea y tipos de fichero, para que el repositorio sea igual en
+# Windows, Linux y macOS.
+* text=auto
+
+*.py   text eol=lf
+*.js   text eol=lf
+*.css  text eol=lf
+*.html text eol=lf
+*.md   text eol=lf
+*.txt  text eol=lf
+*.json text eol=lf
+*.spec text eol=lf
+
+*.ico  binary
+*.png  binary
+*.webp binary
+*.zip  binary
+*.exe  binary

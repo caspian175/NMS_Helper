@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NMS Helper</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">◆</span>
+    <div>
+      <h1>NMS Helper</h1>
+      <p id="save-meta" class="muted">Cargando partida…</p>
+    </div>
+  </div>
+
+  <div class="wallet" id="wallet">
+    <div class="chip"><span class="chip-ico">◈</span><b id="w-units">–</b><small data-i18n="units">Unidades</small></div>
+    <div class="chip"><span class="chip-ico">⬡</span><b id="w-nanites">–</b><small data-i18n="nanites">Nanitas</small></div>
+    <div class="chip"><span class="chip-ico">✦</span><b id="w-quicksilver">–</b><small data-i18n="quicksilver">Quicksilver</small></div>
+  </div>
+
+  <div class="top-actions">
+    <select id="save-select" title="Partida"></select>
+    <button id="lang-toggle" class="ghost" title="ES / EN">EN</button>
+    <span id="live-dot" class="dot" title="Estado de la lectura"></span>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-view="inventory" data-i18n="tab_inventory">Inventario</button>
+  <button class="tab" data-view="recipes" data-i18n="tab_recipes">Recetas</button>
+  <button class="tab" data-view="profile" data-i18n="tab_profile">Partida</button>
+  <button class="tab" data-view="tools" data-i18n="tab_tools">Herramientas</button>
+  <span class="tab-note" id="last-read"></span>
+  <button id="db-btn" class="ghost tab-action">
+    <span data-i18n="db_btn">Actualizar datos</span> <b id="db-dot" class="hidden"></b>
+  </button>
+</nav>
+
+<main>
+  <!-- ============ INVENTARIO ============ -->
+  <section id="view-inventory" class="view">
+    <div class="vitals" id="vitals"></div>
+
+    <div class="inv-layout">
+      <aside class="inv-list" id="inv-list"></aside>
+      <div class="inv-panel">
+        <div class="panel-head">
+          <h2 id="inv-title">–</h2>
+          <div class="panel-tools">
+            <span id="inv-count" class="muted"></span>
+            <input id="inv-filter" type="search" placeholder="Filtrar objetos…" data-i18n-ph="filter">
+          </div>
+        </div>
+        <div class="chips" id="inv-chips">
+          <button class="chip-btn active" data-type="all" data-i18n="chip_all">Todo</button>
+          <button class="chip-btn" data-type="Substance" data-i18n="chip_substance">Sustancias</button>
+          <button class="chip-btn" data-type="Product" data-i18n="chip_product">Productos</button>
+          <button class="chip-btn" data-type="Technology" data-i18n="chip_tech">Tecnología</button>
+        </div>
+        <div id="inv-grid" class="inv-grid"></div>
+        <p id="inv-empty" class="muted hidden" data-i18n="inv_empty">Sin objetos que coincidan con el filtro.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RECETAS ============ -->
+  <section id="view-recipes" class="view hidden">
+    <div class="recipe-layout">
+      <div class="recipe-search">
+        <input id="search-input" type="search" autofocus
+               placeholder="Busca un objeto: circuito de vuelo, carbono…" data-i18n-ph="search">
+        <div class="recipe-actions">
+          <button id="craftable-btn" class="ghost">
+            <span data-i18n="craftable_btn">¿Qué puedo hacer ahora?</span> <b id="craftable-count"></b>
+          </button>
+          <button id="goals-btn" class="ghost">
+            <span data-i18n="goals_btn">Objetivos</span> <b id="goals-count"></b>
+          </button>
+        </div>
+        <div id="craftable-panel" class="search-results hidden"></div>
+        <div id="goals-panel" class="search-results hidden"></div>
+        <div id="search-results" class="search-results"></div>
+      </div>
+      <div id="recipe-detail" class="recipe-detail">
+        <p class="muted" data-i18n="pick_item">Elige un objeto para ver cómo se fabrica y se refina.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PARTIDA ============ -->
+  <section id="view-profile" class="view hidden">
+    <div class="cards" id="profile-cards"></div>
+
+    <div class="fleet">
+      <div class="fleet-head">
+        <h2 data-i18n="fleet_ships">Naves</h2>
+        <span class="muted" id="fleet-ships-note"></span>
+      </div>
+      <div class="fleet-grid" id="fleet-ships"></div>
+    </div>
+
+    <div class="fleet">
+      <div class="fleet-head">
+        <h2 data-i18n="fleet_tools">Multiherramientas</h2>
+      </div>
+      <div class="fleet-grid" id="fleet-tools"></div>
+    </div>
+  </section>
+
+  <!-- ============ HERRAMIENTAS ============ -->
+  <section id="view-tools" class="view hidden">
+    <div class="tools-grid">
+
+      <!-- Líneas ley -->
+      <div class="tool-card" id="card-ley">
+        <h2 data-i18n="ley_title">Líneas ley</h2>
+        <p class="muted tool-hint" data-i18n="ley_hint">
+          Las líneas ley son meridianos por donde salen depósitos. Apunta las
+          coordenadas en un punto de referencia, muévete al menos 1000 u y
+          apunta las del segundo punto con la distancia recorrida.
+        </p>
+
+        <div class="ley-grid">
+          <div class="ley-point">
+            <b data-i18n="ley_read1">Lectura 1</b>
+            <label><span data-i18n="ley_lat">Lat</span>
+              <input id="ley-lat1" type="number" step="0.01"></label>
+            <label><span data-i18n="ley_long">Long</span>
+              <input id="ley-long1" type="number" step="0.01"></label>
+          </div>
+          <div class="ley-point">
+            <b data-i18n="ley_read2">Lectura 2</b>
+            <label><span data-i18n="ley_lat">Lat</span>
+              <input id="ley-lat2" type="number" step="0.01"></label>
+            <label><span data-i18n="ley_long">Long</span>
+              <input id="ley-long2" type="number" step="0.01"></label>
+          </div>
+          <div class="ley-point">
+            <b data-i18n="ley_dist">Distancia</b>
+            <label><span data-i18n="ley_units">u</span>
+              <input id="ley-dist" type="number" step="1" min="0"></label>
+            <button id="ley-calc" class="ghost" data-i18n="ley_calc">Calcular</button>
+          </div>
+        </div>
+
+        <p id="ley-msg" class="muted"></p>
+        <div id="ley-lines" class="ley-lines hidden"></div>
+        <div id="ley-nav" class="ley-nav hidden"></div>
+
+        <div class="ley-saved">
+          <div class="ley-saved-head">
+            <b data-i18n="ley_points_title">Puntos guardados</b>
+            <input id="ley-planet" data-i18n-ph="ley_planet_ph" placeholder="Planeta">
+          </div>
+          <div class="ley-add">
+            <input id="ley-point-name" data-i18n-ph="ley_point_ph" placeholder="Nombre del punto">
+            <input id="ley-point-lat" type="number" step="0.01" data-i18n-ph="ley_lat" placeholder="Lat">
+            <input id="ley-point-long" type="number" step="0.01" data-i18n-ph="ley_long" placeholder="Long">
+            <button id="ley-point-add" class="ghost mini" data-i18n="ley_point_add">Guardar</button>
+          </div>
+          <ul id="ley-points-list" class="ley-list"></ul>
+        </div>
+      </div>
+
+      <!-- Direcciones de portal -->
+      <div class="tool-card" id="card-portal">
+        <h2 data-i18n="portal_title">Dirección de portal</h2>
+        <p class="muted tool-hint" data-i18n="portal_hint">
+          Convierte la dirección galáctica (la que enseña el refuerzo de señal)
+          en los 12 glifos con los que marcas un portal, o al revés.
+        </p>
+
+        <div class="portal-form">
+          <input id="portal-addr" placeholder="046A:0081:0D6D:0038">
+          <select id="portal-planet" title="Glifos"></select>
+          <button id="portal-use-save" class="ghost mini" data-i18n="portal_use_save">Usar mi dirección</button>
+          <button id="portal-to-glyphs" class="ghost mini" data-i18n="portal_to_glyphs">A glifos</button>
+        </div>
+        <div id="portal-glyphs" class="glyph-row hidden"></div>
+        <div id="portal-code-row" class="portal-code-row hidden">
+          <small data-i18n="portal_code">Código de portal</small>
+          <code id="portal-code"></code>
+          <button id="portal-code-copy" class="ghost mini" title="Copiar">⧉</button>
+        </div>
+        <p id="portal-msg" class="muted"></p>
+
+        <div class="portal-form">
+          <input id="portal-glyphs-in" placeholder="046A00810D6D0038" maxlength="16">
+          <button id="portal-to-addr" class="ghost mini" data-i18n="portal_to_addr">A dirección</button>
+        </div>
+        <div id="portal-out" class="muted"></div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<div id="db-backdrop" class="backdrop hidden">
+  <div class="dialog" role="dialog" aria-modal="true">
+    <div class="dialog-head">
+      <h2 data-i18n="db_title">Actualizar datos</h2>
+      <button id="db-close" class="ghost mini" title="Cerrar">✕</button>
+    </div>
+    <p class="muted" data-i18n="db_hint">
+      Vuelve a descargar las tablas de la comunidad (recetas, refinado, objetos)
+      y los textos del juego. Útil tras un parche de No Man's Sky: no toca tus
+      partidas.
+    </p>
+    <div class="dialog-actions">
+      <select id="db-what" title="Qué actualizar">
+        <option value="all" data-i18n="db_what_all">Todo (tablas + textos)</option>
+        <option value="tables" data-i18n="db_what_tables">Solo tablas (recetas y objetos)</option>
+        <option value="lang" data-i18n="db_what_lang">Solo textos del juego</option>
+        <option value="icons" data-i18n="db_what_icons">Solo iconos (todo el catálogo)</option>
+      </select>
+      <button id="db-start" class="ghost" data-i18n="db_start">Empezar</button>
+    </div>
+    <pre id="db-log" class="dialog-log"></pre>
+    <p id="db-status" class="muted dialog-note" data-i18n="db_idle">Sin actualizaciones todavía.</p>
+  </div>
+</div>
+
+<div id="tooltip" class="tooltip hidden"></div>
+
+<script src="/app.js"></script>
+</body>
+</html>

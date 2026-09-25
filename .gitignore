@@ -1,0 +1,29 @@
+# Datos generados: se rebuilding con dos comandos, no van al repositorio.
+#   python tools/update_db.py     # data/db.json, data/jsonmap.txt
+#   python tools/fetch_icons.py   # data/icons/
+#   python tools/fetch_glyphs.py  # data/glyphs/
+data/db.json
+data/jsonmap.txt
+data/icons/
+data/glyphs/
+tools/_dl/
+
+# Empaquetado
+dist/
+*.spec.bak
+build/
+nms_helper.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Sistema / editores
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
+*.log
