@@ -1,0 +1,12 @@
+# Dependencias: ninguna es obligatoria.
+#
+# El programa entero (leer los saves, la base de datos, la interfaz, el
+# conversor de portales, las líneas ley) funciona solo con la stdlib de
+# Python. La única dependencia opcional es pywebview, y únicamente para que
+# `python run.py` abra una ventana de aplicación en vez del navegador:
+#
+#     pip install -r requirements.txt
+#
+# En Windows usa WebView2, que ya viene con Windows 10/11 y con Edge, así que
+# no hay que instalar ningún motor aparte.
+pywebview>=5.0
