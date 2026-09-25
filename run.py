@@ -138,7 +138,15 @@ def main() -> int:
                    "    python tools/update_db.py")
             return 1
 
-        server, httpd = start_server(port=args.port)
+        try:
+            server, httpd = start_server(port=args.port)
+        except OSError as exc:
+            # Lo más normal es que el puerto ya esté pillado por otra cosa.
+            avisar(f"No se ha podido abrir el puerto {args.port}.\n\n{exc}\n\n"
+                   f"Prueba con otro:\n\n"
+                   f"    {'NMS Helper.exe' if FROZEN else 'python run.py'} "
+                   f"--port 9000")
+            return 1
         hilo = threading.Thread(target=httpd.serve_forever, daemon=True)
         hilo.start()
         url = f"http://127.0.0.1:{args.port}"
