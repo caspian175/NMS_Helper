@@ -1,4 +1,4 @@
-# NMS Helper
+# No Man's Sky Helper
 
 Helper local para **No Man's Sky**: muestra tu inventario en tiempo real (con
 toda tu flota), te dice **qué puedes fabricar ya**, te traza el plan para
@@ -6,37 +6,52 @@ conseguir lo que te falta y te ayuda con recetas de fabricación y refinado.
 Además trae una **calculadora de líneas ley** y un **conversor de direcciones
 de portal**.
 
-100 % local: no sale nada de tu ordenador y **no necesita instalar nada más
-que Python** (la única dependencia opcional es `pywebview`, para abrirlo en
-ventana; sin ella se abre en el navegador y funciona igual).
+100 % local: no sale nada de tu ordenador. Lee tus partidas, no las toca.
 
-```
-python run.py
-```
+---
 
-Se abre en una ventana de aplicación (o en el navegador si no hay `pywebview`).
-Puedes dejarlo en una segunda ventana o en una pantalla secundaria mientras
-juegas: cada 2,5 s vuelve a leer tu partida y actualiza la interfaz sola.
+## 👉 Empieza aquí
 
-**¿Prefieres no instalar Python?** Hay un ejecutable para Windows en las
-[releases](#instalar-el-ejecutable-de-windows) — 13 MB, sin instalación. Y si
-te da cosa descargar un `.exe`, siempre puedes usar `python run.py`.
+**1 · Consíguelo**
 
-### La primera vez
+| | |
+| --- | --- |
+| **Windows, sin instalar nada** | Descarga `NMS Helper-windows.zip` de la [release v1.0](https://github.com/caspian175/NMS_Helper/releases), descomprímelo en una **carpeta donde puedas escribir** (por ejemplo `C:\Juegos\NMS Helper`) y abre `NMS Helper.exe`. |
+| **Con Python** | `pip install -r requirements.txt` *(opcional)* y `python run.py` |
 
-Con el `.exe` **no hay que preparar nada**: la base de datos (objetos,
-recetas y textos en español) y los glifos de portal ya vienen dentro, así que
-al abrirlo tienes el inventario, las recetas y las herramientas en marcha.
+**2 · Ábrelo y ya está**
+
+Con el `.exe` **no hay que configurar nada**: la base de datos (objetos,
+recetas y textos en español) y los glifos de portal vienen dentro, así que al
+abrirlo tienes el inventario, las recetas y las herramientas en marcha. Sale
+en una ventana de aplicación (o en el navegador si no está `pywebview`).
+
+**3 · Un botón, la primera vez**
 
 Lo único que no viene son los **iconos del catálogo** (219 MB, que no tiene
 sentido meter en un ejecutable de 13 MB). Hasta que los bajes, los iconos se
-piden a las fuentes comunitarias y hacen falta algo de conexión; a partir de
-ahí la herramienta va **100 % local**. Se bajan con un botón:
+piden a las fuentes comunitarias y hace falta algo de conexión; después la
+herramienta va **100 % local**, también sin red:
 
-**Actualizar datos → Solo iconos (todo el catálogo)**
+> **Actualizar datos → Solo iconos (todo el catálogo)**
 
-Mismo botón para lo demás, que es lo que hay que pulsar **tras un parche de
-No Man's Sky**: *Actualizar datos → Todo*.
+Ese mismo botón es el que hay que pulsar **tras un parche de No Man's Sky**:
+*Actualizar datos → Todo* (tablas, recetas y textos).
+
+**4 · Déjalo abierto mientras juegas**
+
+Cada 2,5 s vuelve a leer tu partida y actualiza la interfaz sola, así que
+puedes dejarlo en una segunda ventana o en una pantalla secundaria.
+
+<details>
+<summary>Más detalles sobre el ejecutable (firma, antivirus, hashes)</summary>
+
+Ver [Instalar el ejecutable de Windows](#instalar-el-ejecutable-de-windows).
+El `.exe` va sin firmar, así que Windows SmartScreen puede avisar: comprueba
+el SHA-256 del ZIP (`SHA256SUMS.txt`) y quita la marca de bloqueo con
+`Unblock-File -Path .\NMS Helper\*`.
+
+</details>
 
 ---
 
