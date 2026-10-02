@@ -1,11 +1,17 @@
-# Datos generados: se rebuilding con dos comandos, no van al repositorio.
+# Datos generados: se reconstruyen con dos comandos.
 #   python tools/update_db.py     # data/db.json, data/jsonmap.txt
 #   python tools/fetch_icons.py   # data/icons/
-#   python tools/fetch_glyphs.py  # data/glyphs/
-data/db.json
+#
+# Van al repositorio dos excepciones, porque la web publicada (GitHub Pages)
+# se arma con la copia versionada y no puede depender de que las fuentes
+# comunitarias estén arriba:
+#   data/db.json    (los datos: se republica al hacer commit tras actualizar)
+#   data/glyphs/    (los 16 glifos de portal: son fijos)
+# y se ignoran las salidas generadas:
+#   site/           (web montada por tools/build_site.py)
 data/jsonmap.txt
 data/icons/
-data/glyphs/
+site/
 tools/_dl/
 
 # Empaquetado

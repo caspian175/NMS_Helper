@@ -690,3 +690,36 @@ button.ghost.mini.on {
 .addr-actions { margin-top: 8px; }
 
 @media (max-width: 720px) { .tools-grid { grid-template-columns: 1fr; } }
+
+/* ---------------- web publicada (sin partida) ----------------
+   body.static solo se pone en el sitio estático (GitHub Pages): se oculta
+   todo lo que depende del save y se enseñan los avisos de modo. */
+body.static #wallet,
+body.static #live-dot,
+body.static #save-select,
+body.static #portal-use-save,
+body.static #vitals,
+body.static .inv-layout,
+body.static #profile-cards,
+body.static .fleet,
+body.static #db-hint,
+body.static #db-actions,
+body.static #db-log,
+body.static #db-status { display: none !important; }
+
+.static-notice {
+  margin: 26px auto;
+  max-width: 580px;
+  padding: 22px 26px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  text-align: center;
+}
+.static-notice p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+#db-info-built, #db-info-sources { font-size: 12.5px; }

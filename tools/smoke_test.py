@@ -202,6 +202,22 @@ def main() -> int:
           status == 200 and blob.startswith(b"\x89PNG") and len(blob) > 1000,
           f"{status}, {len(blob)} B")
 
+    # --- ronda: la interfaz local sigue en modo servidor (y los guiones
+    # nuevos de la web estática se sirven con el resto de web/)
+    status, blob = get_bytes("/config.js")
+    check("web: modo local (NMS_STATIC = false)",
+          status == 200 and b"NMS_STATIC = false" in blob,
+          f"{status}")
+    status, blob = get_bytes("/static-db.js")
+    check("web: API estática empaquetada",
+          status == 200 and len(blob) > 3000,
+          f"{status}, {len(blob)} B")
+    status, blob = get_bytes("/index.html")
+    check("web: index carga config.js y static-db.js",
+          status == 200 and b'src="config.js"' in blob
+          and b'src="static-db.js"' in blob and b'src="/' not in blob,
+          f"{status}")
+
     catalog = list((inv.get("catalog") or {}).values())
     locales = [c for c in catalog if (c.get("icon") or "").startswith("/icons/")]
     remotos = [c for c in catalog if (c.get("icon") or "").startswith("http")]

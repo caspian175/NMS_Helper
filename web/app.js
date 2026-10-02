@@ -95,6 +95,21 @@ const I18N = {
     db_failed: "La actualización ha fallado; mir el log de arriba.",
     db_busy: "Ya hay una actualización en marcha.",
     db_no_update: "No se pudo lanzar la actualización.",
+    // Web publicada: sin servidor detrás, el diálogo de datos solo informa.
+    db_info_btn: "Datos",
+    db_info_title: "Datos de la base",
+    db_info_built: "Datos del",
+    db_info_items: "objetos",
+    db_info_recipes: "recetas",
+    db_info_sources: "Fuentes",
+    db_info_hint: "Esta web se actualiza al publicarla. Si quieres refrescar " +
+      "los datos en tu equipo, usa el programa de escritorio.",
+    craft_all: "Todas las recetas",
+    web_meta: "Versión web · sin partida",
+    web_no_save: "El inventario y los datos de la partida se leen con el " +
+      "programa de escritorio instalado. Esta web incluye el catálogo, las " +
+      "recetas y las herramientas.",
+    web_load_error: "No se pudieron cargar los datos de la web.",
     tab_tools: "Herramientas",
     ley_title: "Líneas ley",
     ley_hint: "Las líneas ley son meridianos por donde salen tres depósitos. " +
@@ -217,6 +232,20 @@ const I18N = {
     db_failed: "The update failed; check the log above.",
     db_busy: "An update is already running.",
     db_no_update: "Could not start the update.",
+    // Web published: no server behind it, the data dialog only informs.
+    db_info_btn: "Data",
+    db_info_title: "Database info",
+    db_info_built: "Data from",
+    db_info_items: "items",
+    db_info_recipes: "recipes",
+    db_info_sources: "Sources",
+    db_info_hint: "This site is refreshed when it is published. To refresh " +
+      "the data on your computer, use the desktop program.",
+    craft_all: "All recipes",
+    web_meta: "Web version · no save",
+    web_no_save: "The inventory and save data are read by the desktop " +
+      "program. This site includes the catalogue, recipes and tools.",
+    web_load_error: "Could not load the site data.",
     tab_tools: "Tools",
     ley_title: "Ley lines",
     ley_hint: "Ley lines are meridians where three deposits spawn. Note your " +
@@ -291,10 +320,21 @@ function applyI18n() {
   });
   $("#lang-toggle").textContent = state.lang === "es" ? "EN" : "ES";
   document.documentElement.lang = state.lang;
+  // Web publicada: los textos que dependen del modo cambian de significado
+  // (no se puede actualizar, no hay «ahora mismo» sin partida…).
+  if (window.NMS_STATIC) {
+    $("#save-meta").textContent = t("web_meta");
+    $("#db-btn span").textContent = t("db_info_btn");
+    $("#db-backdrop h2").textContent = t("db_info_title");
+    $("#craftable-btn span").textContent = t("craft_all");
+  }
 }
 
 /* --------------------------------------------------------------- helpers */
 async function getJSON(url) {
+  // Web publicada (GitHub Pages): no hay servidor detrás, así que las rutas
+  // /api/* las contesta static-db.js con data/db.json cargado en memoria.
+  if (window.NMS_STATIC_API) return window.NMS_STATIC_API.get(url);
   const res = await fetch(url);
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || res.statusText);
@@ -854,7 +894,8 @@ function craftRow(item) {
       <span class="r-name">${escapeHtml(nameOf(item.names) || item.id)}</span><br>
       <span class="r-alt">${escapeHtml(hint)}</span>
     </span>
-    <span class="r-type"><i class="times">×${fmtNumber(item.times)}</i></span>
+    <span class="r-type">${
+      item.times ? `<i class="times">×${fmtNumber(item.times)}</i>` : ""}</span>
   </button>`;
 }
 
@@ -1368,8 +1409,27 @@ const dbUpdate = { timer: null, count: 0, running: false, done: null, log: [] };
 
 function openDbDialog() {
   $("#db-backdrop").classList.remove("hidden");
+  // Web publicada: no hay servidor que actualice; solo se informa de los
+  // datos que sirve el sitio (la foto versionada de data/db.json).
+  if (window.NMS_STATIC) {
+    renderDbInfo();
+    return;
+  }
   renderDbState();
   if (dbUpdate.running) scheduleDbPoll(150);
+}
+
+function renderDbInfo() {
+  const dbInfo = (state.status && state.status.db) || {};
+  const stats = dbInfo.stats || {};
+  $("#db-info-built").textContent =
+    `${t("db_info_built")} ${dbInfo.built_at || "—"} · ` +
+    `${fmtNumber(stats.items || 0)} ${t("db_info_items")} · ` +
+    `${fmtNumber((stats.crafting_recipes || 0) + (stats.refining_recipes || 0))} ` +
+    t("db_info_recipes");
+  $("#db-info-sources").textContent =
+    `${t("db_info_sources")}: ` +
+    (Object.keys(dbInfo.sources || {}).join(" · ") || "—");
 }
 
 function closeDbDialog() {
@@ -1729,7 +1789,7 @@ function glyphTiles(code) {
   ];
   return groups.map((group) => `<span class="glyph-part">${
     group.map((ch) => `<span class="glyph">` +
-      `<img src="/glyphs/${ch.toLowerCase()}.png" alt="${ch}"` +
+      `<img src="glyphs/${ch.toLowerCase()}.png" alt="${ch}"` +
       ` onerror="this.parentNode.classList.add('noimg')">` +
       `<b>${ch}</b></span>`).join("")
   }</span>`).join("");
@@ -1917,9 +1977,37 @@ function bindEvents() {
   });
 }
 
+/* Web publicada: sin partida no hay cartera, inventario ni selector de
+   partidas, y «lo que puedo hacer ahora» no significa nada sin existencias,
+   así que Recetas abre con el catálogo completo. */
+function applyStaticUI() {
+  document.body.classList.add("static");
+  document.querySelectorAll(".static-notice").forEach((el) => {
+    el.classList.remove("hidden");
+  });
+  $("#save-meta").textContent = t("web_meta");
+  setDot("");
+  switchView("recipes");
+  $("#craftable-panel").classList.remove("hidden");
+  renderCraftable(state.craftKind);
+  updateGoalsCount();
+}
+
 async function start() {
   applyI18n();
   bindEvents();
+  if (window.NMS_STATIC_API) {
+    try {
+      await window.NMS_STATIC_API.ready;
+    } catch (err) {
+      $("#save-meta").textContent = t("web_load_error");
+      setDot("error");
+      return;
+    }
+    applyStaticUI();
+    await loadStatus();
+    return;
+  }
   $("#save-meta").textContent = t("loading");
   await loadStatus();
   await loadInventory();

@@ -24,6 +24,7 @@ https://github.com/user-attachments/assets/39ea3beb-1845-4402-8688-bbb841dd6e52
 | --- | --- |
 | **Windows, sin instalar nada** | Descarga `NMS Helper-windows.zip` de la [release v1.0](https://github.com/caspian175/NMS_Helper/releases), descomprímelo en una **carpeta donde puedas escribir** (por ejemplo `C:\Juegos\NMS Helper`) y abre `NMS Helper.exe`. |
 | **Con Python** | `pip install -r requirements.txt` *(opcional)* y `python run.py` |
+| **🌐 Solo en el navegador** | <https://caspian175.github.io/NMS_Helper/> — catálogo, recetas, plan y herramientas desde cualquier sistema operativo, sin instalar nada. Las funciones que leen la partida están en el programa de escritorio. |
 
 **2 · Ábrelo y ya está**
 
@@ -292,6 +293,48 @@ python tools/update_db.py --lang     # solo textos en español
 Si no hay conexión, se mantiene lo ya descargado y la herramienta sigue
 funcionando. Después de descargar, `data/db.json` se reconstruye solo.
 
+Ese `data/db.json` **va versionado en el repositorio**: es la foto con la
+que se publica la web (y con la que arranca el `.exe`), así que tras
+actualizarlo conviene hacer *commit* y *push*.
+
+---
+
+## 🌐 Versión web (GitHub Pages)
+
+La misma interfaz está publicada en
+**<https://caspian175.github.io/NMS_Helper/>**: se abre en el navegador de
+cualquier sistema operativo, sin instalar nada.
+
+| | |
+| --- | --- |
+| **Sí** | búsqueda y catálogo completo, fichas de objeto, todas las recetas, plan de crafteo con lista de la compra, objetivos, glifos de portal y todas las herramientas |
+| **No** | inventario, cartera y datos de la partida (se leen de `save.hg`: eso lo hace el programa de escritorio) |
+| **Datos** | la copia versionada del repositorio (`data/db.json`); al abrirla **no se descarga nada de las fuentes comunitarias**, así que no se rompe si alguna cae |
+| **Iconos** | URLs de las bases comunitarias; si una imagen no carga, se ve la ficha de color con la inicial |
+
+### Cómo se publica
+
+En cada *push* a `main`, GitHub Actions (`.github/workflows/pages.yml`)
+comprueba con `tools/static_parity.py` que la API estática del navegador
+(`web/static-db.js`) cuadra con `nms_helper/db.py` y monta `site/` con
+`tools/build_site.py`. Si algo falla, **no se publica nada y la web sigue
+sirviendo la versión anterior**.
+
+Dos cosas que hacer una vez:
+
+1. En el repo: **Settings → Pages → Source: GitHub Actions**.
+2. `git push` (sin `-f`).
+
+Para refrescar los datos de la web: actualiza en local (*Actualizar datos*),
+haz *commit* de `data/db.json` y *push*; Actions republica sola.
+
+Para probarla en local:
+
+```
+python tools/build_site.py
+python -m http.server 8000 --directory site
+```
+
 ---
 
 ## Instalar el ejecutable de Windows
@@ -387,13 +430,15 @@ NMS_Helper/
 │   ├── index.html
 │   ├── style.css
 │   ├── app.js
+│   ├── config.js           # modo: servidor local (false) / sitio estático (true)
+│   ├── static-db.js        # /api/* en el navegador (solo la web publicada)
 │   ├── favicon.svg
 │   └── nms_helper.ico    # icono de la ventana y del ejecutable
 ├── data/
 │   ├── jsonmap.txt         # mapa de claves de los saves
-│   ├── db.json             # objetos + recetas (generado)
+│   ├── db.json             # objetos + recetas (foto versionada: alimenta la web)
 │   ├── icons/              # iconos del catálogo + map.json (se sirven en /icons/…)
-│   └── glyphs/             # los 16 glifos de portal (se sirven en /glyphs/…)
+│   └── glyphs/             # los 16 glifos de portal (van al repo y a la web)
 ├── tools/
 │   ├── _common.py          # rutas de las herramientas (también al empaquetar)
 │   ├── update_db.py        # descarga/actualiza las fuentes comunitarias
@@ -402,10 +447,14 @@ NMS_Helper/
 │   ├── fetch_glyphs.py     # baja los 16 glifos de portal a data/glyphs/
 │   ├── make_icons.py       # dibuja web/nms_helper.ico con la stdlib
 │   ├── build_exe.py        # empaqueta el ejecutable de Windows + SHA-256
+│   ├── build_site.py       # monta site/ para GitHub Pages
+│   ├── static_parity.py    # comprueba static-db.js contra db.py (node: static_parity.js)
 │   ├── explore_data.py     # inspección de fuentes (desarrollo)
 │   ├── hgpak.py            # lector de los .pak del juego (HGPAK v2)
 │   ├── smoke_test.py       # prueba de los endpoints (servidor abierto)
 │   └── _dl/                # copia local de las fuentes descargadas
+├── .github/workflows/pages.yml  # publica la web en Pages en cada push
+├── site/                   # web montada (generada por build_site.py, no va al repo)
 ├── nms_helper/
 │   ├── paths.py            # dónde está cada carpeta (código o .exe)
 │   ├── window.py           # ventana con pywebview/WebView2
@@ -430,9 +479,19 @@ NMS_Helper/
 | `GET /api/update/start?what=` | lanza `tools/update_db.py` (`all`/`tables`/`lang`); `409` si ya había una en marcha |
 | `GET /api/update/state?since=` | log de la actualización en curso (`lines`, `count`, `running`, `exit`) |
 
+En la web publicada, esas mismas rutas (salvo las de partida y las de
+actualización) las resuelve `web/static-db.js` en el navegador con
+`data/db.json`; `tools/static_parity.py` comprueba que ambas coinciden.
+
 ---
 
 ## Límites conocidos y siguientes pasos
+
+- **Versión web sin partida**: en GitHub Pages no hay servidor detrás, así
+  que la web no lee `save.hg` (ni inventario, ni cartera, ni datos de la
+  partida). Todo lo demás —catálogo, recetas, plan, objetivos, glifos y
+  herramientas— es idéntico, y sus datos son la copia versionada del
+  repositorio.
 
 - **Solo Steam, y solo Windows**: está probado con la versión de Steam en
   Windows 10/11 de 64 bits. Si compras el juego en otra tienda, sus partidas

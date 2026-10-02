@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NMS Helper</title>
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="topbar">
@@ -44,6 +44,12 @@
 <main>
   <!-- ============ INVENTARIO ============ -->
   <section id="view-inventory" class="view">
+    <!-- Web publicada: sin partida no hay inventario que leer. -->
+    <div id="inv-notice" class="static-notice hidden">
+      <p data-i18n="web_no_save">El inventario y los datos de la partida se
+        leen con el programa de escritorio instalado. Esta web incluye el
+        catálogo, las recetas y las herramientas.</p>
+    </div>
     <div class="vitals" id="vitals"></div>
 
     <div class="inv-layout">
@@ -94,6 +100,12 @@
 
   <!-- ============ PARTIDA ============ -->
   <section id="view-profile" class="view hidden">
+    <!-- Web publicada: la partida (cartera, naves, dirección) vive en el save. -->
+    <div id="profile-notice" class="static-notice hidden">
+      <p data-i18n="web_no_save">El inventario y los datos de la partida se
+        leen con el programa de escritorio instalado. Esta web incluye el
+        catálogo, las recetas y las herramientas.</p>
+    </div>
     <div class="cards" id="profile-cards"></div>
 
     <div class="fleet">
@@ -206,12 +218,18 @@
       <h2 data-i18n="db_title">Actualizar datos</h2>
       <button id="db-close" class="ghost mini" title="Cerrar">✕</button>
     </div>
-    <p class="muted" data-i18n="db_hint">
+    <p class="muted" id="db-hint" data-i18n="db_hint">
       Vuelve a descargar las tablas de la comunidad (recetas, refinado, objetos)
       y los textos del juego. Útil tras un parche de No Man's Sky: no toca tus
       partidas.
     </p>
-    <div class="dialog-actions">
+    <!-- Web publicada: no hay servidor que actualice; solo se informa. -->
+    <div id="db-static" class="hidden">
+      <p class="muted" id="db-info-built"></p>
+      <p class="muted" id="db-info-sources"></p>
+      <p class="muted" data-i18n="db_info_hint"></p>
+    </div>
+    <div class="dialog-actions" id="db-actions">
       <select id="db-what" title="Qué actualizar">
         <option value="all" data-i18n="db_what_all">Todo (tablas + textos)</option>
         <option value="tables" data-i18n="db_what_tables">Solo tablas (recetas y objetos)</option>
@@ -227,6 +245,8 @@
 
 <div id="tooltip" class="tooltip hidden"></div>
 
-<script src="/app.js"></script>
+<script src="config.js"></script>
+<script src="static-db.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
